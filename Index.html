@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lilizec Transport - Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange:#FF6B00; --orange-dark:#D45800;
+  --dark:#1A1A2E; --darker:#0F0F1A; --card:#16213E;
+  --border:#2A2D5E; --text:#E8E8F0; --muted:#8A8AAA;
+  --green:#00C853; --red:#FF3B5C; --yellow:#FFB300; --blue:#2196F3;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--darker);color:var(--text);font-family:'Poppins',sans-serif;min-height:100vh;}
+input,textarea,select,button{font-family:'Poppins',sans-serif;}
+
+/* SCREENS */
+.screen{display:none!important;}
+.screen.on{display:block!important;}
+
+/* HEADER */
+header{background:var(--dark);border-bottom:2px solid var(--orange);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 4px 20px rgba(255,107,0,0.2);}
+.hdr{max-width:900px;margin:auto;display:flex;align-items:center;justify-content:space-between;height:62px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:40px;height:40px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.logo-text{font-size:18px;font-weight:800;color:#fff;}
+.logo-text span{color:var(--orange);}
+.help-a{border:1px solid var(--orange);color:var(--orange);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;transition:all 0.2s;}
+.help-a:hover{background:var(--orange);color:#fff;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--dark),#1a0a00);padding:36px 20px 26px;text-align:center;border-bottom:1px solid var(--border);}
+.hero h1{font-size:clamp(20px,5vw,34px);font-weight:800;color:#fff;}
+.hero h1 span{color:var(--orange);}
+.hero p{color:var(--muted);margin-top:8px;font-size:14px;}
+
+/* FORM */
+.main{max-width:860px;margin:24px auto;padding:0 16px 60px;}
+.autofill-bar{background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.3);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--green);display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.card.c-vehicle::before{background:var(--green);}
+.card.c-pickup::before{background:var(--orange);}
+.card.c-drop::before{background:#00BFFF;}
+.card.c-pay::before{background:#9C27B0;}
+.ctitle{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.ctitle .ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.c-vehicle .ico{background:rgba(0,200,83,0.2);color:var(--green);}
+.c-pickup .ico{background:rgba(255,107,0,0.2);color:var(--orange);}
+.c-drop .ico{background:rgba(0,191,255,0.2);color:#00BFFF;}
+.c-pay .ico{background:rgba(156,33,176,0.2);color:#CE93D8;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:580px){.row2{grid-template-columns:1fr;}}
+.f{margin-bottom:13px;}
+.f label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.f input,.f textarea,.f select{width:100%;background:var(--darker);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;outline:none;transition:border-color 0.2s;}
+.f input:focus,.f textarea:focus,.f select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,107,0,0.1);}
+.f textarea{resize:vertical;min-height:76px;}
+
+/* Vehicle radio */
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.vopt{border:2px solid var(--border);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:all 0.2s;background:var(--darker);}
+.vopt:hover,.vopt.sel{border-color:var(--orange);background:rgba(255,107,0,0.08);}
+.vopt .vi{font-size:28px;margin-bottom:6px;}
+.vopt .vn{font-size:13px;font-weight:600;}
+.vopt .vd{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* Payment radio */
+.pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:460px){.pgrid{grid-template-columns:1fr;}}
+.popt{border:2px solid var(--border);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.2s;background:var(--darker);}
+.popt:hover,.popt.sel{border-color:#CE93D8;background:rgba(156,33,176,0.1);}
+.popt .pi{font-size:22px;margin-bottom:5px;}
+.popt .pn{font-size:12px;font-weight:600;}
+.popt .pd{font-size:10px;color:var(--muted);margin-top:2px;}
+
+.info-note{display:flex;gap:8px;font-size:12px;color:var(--muted);margin-top:10px;}
+
+/* SUBMIT BTN */
+.submit-btn{width:100%;padding:16px;background:linear-gradient(135deg,#FF6B00,#D45800);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 8px 25px rgba(255,107,0,0.4);transition:all 0.3s;margin-top:4px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(255,107,0,0.55);}
+.submit-btn:active{transform:translateY(0);}
+
+/* SUCCESS POPUP */
+#successBox{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+#successBox .sbox{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 28px;max-width:400px;width:100%;text-align:center;animation:pop 0.3s ease;}
+@keyframes pop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+#successBox .sbox .tick{font-size:56px;margin-bottom:12px;}
+#successBox .sbox h2{font-size:22px;font-weight:800;color:var(--green);margin-bottom:8px;}
+#successBox .sbox p{color:var(--muted);font-size:13px;line-height:1.7;}
+#successBox .sbox .bid{background:var(--darker);border:1px solid var(--border);border-radius:10px;padding:12px;margin:14px 0;font-size:22px;font-weight:800;color:var(--orange);}
+#successBox .wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;border:none;border-radius:12px;padding:13px;width:100%;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;text-decoration:none;}
+#successBox .cls-btn{background:var(--darker);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:11px;width:100%;font-size:13px;cursor:pointer;margin-top:8px;}
+
+/* ===== ADMIN LOGIN ===== */
+#adminLogin{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.lbox{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:360px;text-align:center;}
+.lbox .lic{font-size:46px;margin-bottom:14px;}
+.lbox h1{font-size:20px;font-weight:800;margin-bottom:6px;}
+.lbox p{color:var(--muted);font-size:13px;margin-bottom:22px;}
+.lbox input{width:100%;background:var(--darker);border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--text);font-size:15px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:12px;transition:border-color 0.2s;}
+.lbox input:focus{border-color:var(--orange);}
+.lbtn{width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;}
+.lbtn:hover{background:var(--orange-dark);}
+.lerr{color:var(--red);font-size:13px;margin-top:10px;}
+.bk-link{color:var(--muted);font-size:12px;margin-top:16px;cursor:pointer;display:block;}
+.bk-link:hover{color:var(--orange);}
+
+/* ===== ADMIN PANEL ===== */
+.atabs{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:4px;overflow-x:auto;}
+.atab{padding:14px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all 0.2s;}
+.atab.on{color:var(--orange);border-bottom-color:var(--orange);}
+.amain{max-width:1100px;margin:22px auto;padding:0 16px 60px;}
+.asec{display:none;}
+.asec.on{display:block;}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.sc .sl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.sc .sv{font-size:28px;font-weight:800;margin-top:4px;}
+.sc.t .sv{color:var(--orange);}
+.sc.p .sv{color:var(--yellow);}
+.sc.d .sv{color:var(--green);}
+.sc.r .sv{color:var(--blue);}
+.frow{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.fc{padding:7px 16px;border-radius:50px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all 0.2s;background:var(--card);}
+.fc.on,.fc:hover{background:var(--orange);border-color:var(--orange);color:#fff;}
+.blist{display:flex;flex-direction:column;gap:12px;}
+.bk{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.bk:hover{border-color:rgba(255,107,0,0.4);}
+.bk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.bk-id{font-size:13px;font-weight:700;color:var(--orange);}
+.bk-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.badge{padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;}
+.badge.pending{background:rgba(255,179,0,0.15);color:var(--yellow);}
+.badge.assigned{background:rgba(33,150,243,0.15);color:var(--blue);}
+.badge.done{background:rgba(0,200,83,0.15);color:var(--green);}
+.badge.cancelled{background:rgba(255,59,92,0.15);color:var(--red);}
+.bk-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+@media(max-width:560px){.bk-info{grid-template-columns:1fr;}}
+.ib .ibl{font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:600;text-transform:uppercase;}
+.ib .ibv{font-size:13px;font-weight:500;}
+.ib .iba{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
+.bk-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.ab{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid;cursor:pointer;transition:all 0.2s;background:transparent;}
+.ab:hover{opacity:0.8;}
+.ab.asgn{color:var(--blue);border-color:rgba(33,150,243,0.4);}
+.ab.dn{color:var(--green);border-color:rgba(0,200,83,0.4);}
+.ab.cn{color:var(--red);border-color:rgba(255,59,92,0.3);}
+.ab.wa{color:#25D366;border-color:rgba(37,211,102,0.3);text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.dsel{background:var(--darker);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;}
+.add-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
+.add-form h3{font-size:14px;font-weight:700;margin-bottom:14px;}
+.dfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.add-btn{margin-top:12px;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.dc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.dc .dn2{font-size:15px;font-weight:700;}
+.dc .dp{font-size:13px;color:var(--orange);margin-top:3px;}
+.dc .di{font-size:12px;color:var(--muted);margin-top:2px;}
+.av{font-size:11px;padding:4px 10px;border-radius:50px;font-weight:700;margin-top:8px;display:inline-block;}
+.av.y{background:rgba(0,200,83,0.15);color:var(--green);}
+.av.n{background:rgba(255,179,0,0.15);color:var(--yellow);}
+.dbtns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.db{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:var(--darker);color:var(--text);}
+.db:hover{border-color:var(--orange);color:var(--orange);}
+.db.del:hover{border-color:var(--red);color:var(--red);}
+.sset{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;max-width:420px;margin-bottom:16px;}
+.sset h3{font-size:14px;font-weight:700;margin-bottom:14px;}
+.sset input{width:100%;background:var(--darker);border:1px solid var(--border);border-radius:8px;padding:11px 12px;color:var(--text);font-size:14px;outline:none;margin-bottom:10px;}
+.sset input:focus{border-color:var(--orange);}
+.ssv{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;}
+.sm{font-size:12px;margin-top:8px;}
+.sm.ok{color:var(--green);}
+.sm.er{color:var(--red);}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:14px;}
+.empty .ei{font-size:40px;margin-bottom:10px;}
+.hdr-admin{display:flex;gap:8px;}
+.hab{border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;border:1px solid var(--border);background:transparent;color:var(--muted);}
+.hab:hover{border-color:var(--orange);color:var(--orange);}
+</style>
+</head>
+<body>
+
+<!-- ========== SUCCESS POPUP (outside all screens) ========== -->
+<div id="successBox" style="display:none;">
+  <div class="sbox">
+    <div class="tick">✅</div>
+    <h2>Booking Ho Gayi!</h2>
+    <p>Aapki request mil gayi. Driver assign karke WhatsApp karenge.</p>
+    <div class="bid" id="bidShow">BK-000001</div>
+    <p style="font-size:11px;color:var(--muted)">Yeh ID save karein — tracking ke liye.</p>
+    <a id="waLink" class="wa-btn" target="_blank">📲 WhatsApp Par Confirm Karein</a>
+    <button class="cls-btn" onclick="closeSuccess()">Band Karein</button>
+  </div>
+</div>
+
+<!-- ========== SCREEN 1: BOOKING ========== -->
+<div class="screen on" id="scrBooking">
+  <header>
+    <div class="hdr">
+      <div class="logo">
+        <div class="logo-icon">🚛</div>
+        <div class="logo-text">Lili<span>zec</span> Transport</div>
+      </div>
+      <a href="mailto:lilizectransport@gmail.com" class="help-a">📧 Help</a>
+    </div>
+  </header>
+  <div class="hero">
+    <h1>E-Riksha & Pickup <span>Booking</span></h1>
+    <p>Aasan Booking • Tez Service • Bharosemand Delivery</p>
+  </div>
+  <div class="main">
+    <div class="autofill-bar" id="autofillBar" style="display:none;">
+      ✅ Aapki purani details auto-fill ho gayi — zaroorat ho to edit karein.
+    </div>
+
+    <!-- Vehicle -->
+    <div class="card c-vehicle">
+      <div class="ctitle"><div class="ico">🚗</div>Vehicle Chunein</div>
+      <div class="vgrid">
+        <div class="vopt sel" id="vr" onclick="selV('riksha')">
+          <div class="vi">🛺</div><div class="vn">E-Riksha</div><div class="vd">Chhota Saman</div>
+        </div>
+        <div class="vopt" id="vp" onclick="selV('pickup')">
+          <div class="vi">🚛</div><div class="vn">Pickup Gadi</div><div class="vd">Bada / Bhari Saman</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pickup -->
+    <div class="card c-pickup">
+      <div class="ctitle"><div class="ico">📦</div>Pickup Details (Aapki Jaankari)</div>
+      <div class="row2">
+        <div class="f"><label>Aapka Naam *</label><input type="text" id="sName" placeholder="Jaise: Ramesh Kumar"></div>
+        <div class="f"><label>Mobile No. *</label><input type="tel" id="sPhone" placeholder="Mobile Number"></div>
+      </div>
+      <div class="f"><label>Pickup Address *</label><textarea id="sAddr" placeholder="Makan No., Gali, Mohalla, Shahar..."></textarea></div>
+      <div class="f"><label>Saman ki Jaankari *</label><input type="text" id="goods" placeholder="Jaise: 5 boxes, furniture, grocery..."></div>
+      <div class="f"><label>Pickup Date & Time</label><input type="datetime-local" id="pTime"></div>
+    </div>
+
+    <!-- Drop -->
+    <div class="card c-drop">
+      <div class="ctitle"><div class="ico">📍</div>Drop Details (Kahan Jana Hai)</div>
+      <div class="row2">
+        <div class="f"><label>Receiver ka Naam *</label><input type="text" id="rName" placeholder="Jise Saman Milega"></div>
+        <div class="f"><label>Receiver ka No. *</label><input type="tel" id="rPhone" placeholder="Mobile Number"></div>
+      </div>
+      <div class="f"><label>Drop Address *</label><textarea id="rAddr" placeholder="Makan No., Gali, Mohalla, Shahar..."></textarea></div>
+      <div class="f"><label>Special Note (Optional)</label><input type="text" id="note" placeholder="Jaise: fragile item, urgent..."></div>
+    </div>
+
+    <!-- Payment -->
+    <div class="card c-pay">
+      <div class="ctitle"><div class="ico">💳</div>Payment Method</div>
+      <div class="pgrid">
+        <div class="popt sel" id="pupi" onclick="selP('upi')">
+          <div class="pi">📱</div><div class="pn">UPI / QR</div><div class="pd">WhatsApp par QR milega</div>
+        </div>
+        <div class="popt" id="pcash" onclick="selP('cash')">
+          <div class="pi">💵</div><div class="pn">Cash</div><div class="pd">Delivery par</div>
+        </div>
+        <div class="popt" id="ponline" onclick="selP('online')">
+          <div class="pi">🏦</div><div class="pn">Online Transfer</div><div class="pd">A/c No. WhatsApp par</div>
+        </div>
+      </div>
+      <div class="info-note"><span>ℹ️</span><span>Payment details confirm hone ke baad WhatsApp par bheje jayenge.</span></div>
+    </div>
+
+    <button class="submit-btn" onclick="submitBooking()">🚀 Booking Confirm Karein</button>
+
+    <!-- Hidden Admin Link - Footer -->
+    <div style="text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #2A2D5E;">
+      <p style="color:#8A8AAA;font-size:12px;">© 2025 Lilizec Transport | <a href="mailto:lilizectransport@gmail.com" style="color:#8A8AAA;">lilizectransport@gmail.com</a></p>
+      <p style="margin-top:8px;font-size:11px;color:#444466;">
+        <span onclick="goScreen('scrAdminLogin')" style="cursor:pointer;color:#444466;user-select:none;" title="">⚙</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN 2: ADMIN LOGIN ========== -->
+<div class="screen" id="scrAdminLogin">
+  <div id="adminLogin">
+    <div class="lbox">
+      <div class="lic">🔐</div>
+      <h1>Admin Login</h1>
+      <p>Yeh page sirf admin ke liye hai.</p>
+      <input type="password" id="passIn" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="lbtn" onclick="doLogin()">Login Karein</button>
+      <div class="lerr" id="lerr" style="display:none">❌ Galat password.</div>
+      <span class="bk-link" onclick="goScreen('scrBooking')">← Wapas Booking Page</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN 3: ADMIN PANEL ========== -->
+<div class="screen" id="scrAdmin">
+  <header>
+    <div class="hdr">
+      <div class="logo">
+        <div class="logo-icon">⚙️</div>
+        <div class="logo-text">Lilizec <span>Admin</span></div>
+      </div>
+      <div class="hdr-admin">
+        <button class="hab" onclick="goScreen('scrBooking')">🌐 Website</button>
+        <button class="hab" onclick="doLogout()" style="color:var(--red);border-color:rgba(255,59,92,0.3)">🚪 Logout</button>
+      </div>
+    </div>
+  </header>
+  <div class="atabs">
+    <div class="atab on" onclick="aTab('bookings',this)">📦 Bookings</div>
+    <div class="atab" onclick="aTab('drivers',this)">🚗 Drivers</div>
+    <div class="atab" onclick="aTab('settings',this)">⚙️ Settings</div>
+  </div>
+  <div class="amain">
+    <div class="sgrid" id="sgrid"></div>
+    <!-- Bookings -->
+    <div class="asec on" id="as-bookings">
+      <div class="frow">
+        <div class="fc on" onclick="filt('all',this)">Sabhi</div>
+        <div class="fc" onclick="filt('pending',this)">⏳ Pending</div>
+        <div class="fc" onclick="filt('assigned',this)">🚗 Assigned</div>
+        <div class="fc" onclick="filt('done',this)">✅ Done</div>
+        <div class="fc" onclick="filt('cancelled',this)">❌ Cancelled</div>
+      </div>
+      <div class="blist" id="blist"></div>
+    </div>
+    <!-- Drivers -->
+    <div class="asec" id="as-drivers">
+      <div class="add-form">
+        <h3>➕ Naya Driver Jodein</h3>
+        <div class="dfg">
+          <div class="f"><label>Naam *</label><input id="dN" placeholder="Driver ka naam"></div>
+          <div class="f"><label>Mobile *</label><input type="tel" id="dPh" placeholder="Mobile number"></div>
+          <div class="f"><label>Vehicle *</label><select id="dV"><option value="riksha">🛺 E-Riksha</option><option value="pickup">🚛 Pickup</option></select></div>
+          <div class="f"><label>Vehicle No. *</label><input id="dVN" placeholder="UP32AB1234"></div>
+          <div class="f"><label>Area</label><input id="dA" placeholder="Ward / City"></div>
+        </div>
+        <button class="add-btn" onclick="addDriver()">✓ Driver Save Karein</button>
+      </div>
+      <div class="dgrid" id="dlist"></div>
+    </div>
+    <!-- Settings -->
+    <div class="asec" id="as-settings">
+      <div class="sset">
+        <h3>🔑 Password Badlein</h3>
+        <input type="password" id="op" placeholder="Purana Password">
+        <input type="password" id="np" placeholder="Naya Password">
+        <input type="password" id="np2" placeholder="Naya Password dobara">
+        <button class="ssv" onclick="chgPass()">Password Badlein</button>
+        <div class="sm" id="pmsg"></div>
+      </div>
+      <div class="sset">
+        <h3>📱 Aapka WhatsApp No.</h3>
+        <input type="tel" id="waN" placeholder="91XXXXXXXXXX">
+        <button class="ssv" onclick="saveWa()">Save Karein</button>
+        <div class="sm ok" id="wamsg" style="display:none">✅ Saved!</div>
+      </div>
+      <div class="sset" style="border-color:rgba(255,59,92,0.3)">
+        <h3 style="color:var(--red)">⚠️ Bookings Clear Karein</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Drivers nahi jayenge.</p>
+        <button class="ssv" style="background:var(--red)" onclick="clearBk()">Clear Karein</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== KEYS =====
+const K = { pass:'lz_pass', bk:'lz_bk', dr:'lz_dr', sender:'lz_sender', cnt:'lz_cnt', wa:'lz_wa' };
+const DEF_PASS = 'lilizec@2025';
+
+// ===== HELPERS =====
+const $ = id => document.getElementById(id);
+const getBk = () => JSON.parse(localStorage.getItem(K.bk)||'[]');
+const saveBk = b => localStorage.setItem(K.bk, JSON.stringify(b));
+const getDr = () => JSON.parse(localStorage.getItem(K.dr)||'[]');
+const saveDr = d => localStorage.setItem(K.dr, JSON.stringify(d));
+const getPass = () => localStorage.getItem(K.pass) || DEF_PASS;
+
+// ===== SCREEN SWITCH =====
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  $(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+// ===== SECRET ADMIN ACCESS — type "admin" =====
+let sbuf = '';
+document.addEventListener('keyup', e => {
+  sbuf = (sbuf + e.key.toLowerCase()).slice(-7);
+  if (sbuf.includes('admin')) {
+    sbuf = '';
+    sessionStorage.getItem('lz_auth')==='1' ? goScreen('scrAdmin') : goScreen('scrAdminLogin');
+  }
+});
+
+// ===== AUTO-FILL SENDER =====
+window.addEventListener('load', () => {
+  const s = localStorage.getItem(K.sender);
+  if (s) {
+    const d = JSON.parse(s);
+    if(d.name)  $('sName').value  = d.name;
+    if(d.phone) $('sPhone').value = d.phone;
+    if(d.addr)  $('sAddr').value  = d.addr;
+    $('autofillBar').style.display = 'flex';
+  }
+  // min datetime
+  const now = new Date();
+  now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+  $('pTime').min = now.toISOString().slice(0,16);
+
+  // restore admin session
+  if (sessionStorage.getItem('lz_auth')==='1') {
+    // stay on booking page but admin accessible via secret
+  }
+});
+
+// ===== VEHICLE & PAYMENT SELECT =====
+let curV = 'riksha', curP = 'upi';
+function selV(v) {
+  curV = v;
+  $('vr').classList.toggle('sel', v==='riksha');
+  $('vp').classList.toggle('sel', v==='pickup');
+}
+function selP(p) {
+  curP = p;
+  ['upi','cash','online'].forEach(x => $('p'+x).classList.toggle('sel', x===p));
+}
+
+// ===== BOOKING ID =====
+function nextId() {
+  let c = parseInt(localStorage.getItem(K.cnt)||'0')+1;
+  localStorage.setItem(K.cnt, c);
+  return 'BK-'+String(c).padStart(6,'0');
+}
+
+// ===== SUBMIT BOOKING =====
+function submitBooking() {
+  const sName  = $('sName').value.trim();
+  const sPhone = $('sPhone').value.trim();
+  const sAddr  = $('sAddr').value.trim();
+  const goods  = $('goods').value.trim();
+  const pTime  = $('pTime').value || 'Jald se jald';
+  const rName  = $('rName').value.trim();
+  const rPhone = $('rPhone').value.trim();
+  const rAddr  = $('rAddr').value.trim();
+  const note   = $('note').value.trim();
+
+  // Validate
+  if (!sName)  { alert('Apna naam daalen!');           $('sName').focus();  return; }
+  if (!sPhone) { alert('Apna phone number daalen!');   $('sPhone').focus(); return; }
+  if (!sAddr)  { alert('Pickup address daalen!');      $('sAddr').focus();  return; }
+  if (!goods)  { alert('Saman ki jaankari daalen!');   $('goods').focus();  return; }
+  if (!rName)  { alert('Receiver ka naam daalen!');    $('rName').focus();  return; }
+  if (!rPhone) { alert('Receiver ka number daalen!');  $('rPhone').focus(); return; }
+  if (!rAddr)  { alert('Drop address daalen!');        $('rAddr').focus();  return; }
+
+  // Save sender for next time
+  localStorage.setItem(K.sender, JSON.stringify({name:sName, phone:sPhone, addr:sAddr}));
+
+  // Create booking
+  const id = nextId();
+  const bk = {
+    id, vehicle:curV, payment:curP,
+    sName, sPhone, sAddr, goods, pTime,
+    rName, rPhone, rAddr, note,
+    status:'pending', driver:'', driverName:'',
+    time: new Date().toISOString()
+  };
+  const list = getBk();
+  list.unshift(bk);
+  saveBk(list);
+
+  // WhatsApp message
+  const vl = curV==='riksha'?'E-Riksha':'Pickup Gadi';
+  const pl = curP==='upi'?'UPI/QR':curP==='cash'?'Cash':'Online Transfer';
+  const waNum = localStorage.getItem(K.wa)||'';
+  const msg = encodeURIComponent(
+    `🚛 *Lilizec Transport - New Booking*\n━━━━━━━━━━\n`+
+    `📋 ID: ${id}\n🚗 Vehicle: ${vl}\n\n`+
+    `📦 *SENDER*\n👤 ${sName}\n📞 ${sPhone}\n📍 ${sAddr}\n📦 ${goods}\n🕐 ${pTime}\n\n`+
+    `📍 *RECEIVER*\n👤 ${rName}\n📞 ${rPhone}\n📍 ${rAddr}\n`+
+    (note?`📝 ${note}\n`:'')+
+    `\n💳 Payment: ${pl}`
+  );
+
+  $('bidShow').textContent = id;
+  $('waLink').href = waNum ? `https://wa.me/${waNum}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  $('successBox').style.display = 'flex';
+}
+
+function closeSuccess() {
+  $('successBox').style.display = 'none';
+  // Reset form
+  ['sName','sPhone','sAddr','goods','pTime','rName','rPhone','rAddr','note'].forEach(id => $(id).value='');
+  // Restore auto-fill
+  const s = localStorage.getItem(K.sender);
+  if (s) {
+    const d = JSON.parse(s);
+    if(d.name)  $('sName').value  = d.name;
+    if(d.phone) $('sPhone').value = d.phone;
+    if(d.addr)  $('sAddr').value  = d.addr;
+  }
+  selV('riksha'); selP('upi');
+}
+
+// ===== ADMIN LOGIN =====
+function doLogin() {
+  if ($('passIn').value === getPass()) {
+    sessionStorage.setItem('lz_auth','1');
+    $('passIn').value = '';
+    goScreen('scrAdmin');
+    loadAdmin();
+  } else {
+    $('lerr').style.display='block';
+    $('passIn').value='';
+    setTimeout(()=>$('lerr').style.display='none', 3000);
+  }
+}
+function doLogout() {
+  sessionStorage.removeItem('lz_auth');
+  goScreen('scrBooking');
+}
+
+// ===== ADMIN TABS =====
+function aTab(name, el) {
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.asec').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  $('as-'+name).classList.add('on');
+  if(name==='bookings') renderBk();
+  if(name==='drivers')  renderDr();
+  if(name==='settings') loadSettings();
+}
+
+function loadAdmin() { renderStats(); renderBk(); }
+
+// STATS
+function renderStats() {
+  const b=getBk(), d=getDr();
+  $('sgrid').innerHTML=`
+    <div class="sc t"><div class="sl">Total</div><div class="sv">${b.length}</div></div>
+    <div class="sc p"><div class="sl">⏳ Pending</div><div class="sv">${b.filter(x=>x.status==='pending').length}</div></div>
+    <div class="sc d"><div class="sl">✅ Done</div><div class="sv">${b.filter(x=>x.status==='done').length}</div></div>
+    <div class="sc r"><div class="sl">🚗 Drivers</div><div class="sv">${d.length}</div></div>`;
+}
+
+// BOOKINGS
+let curF='all';
+function filt(f,el){
+  document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); curF=f; renderBk();
+}
+function renderBk() {
+  renderStats();
+  let bk=getBk();
+  if(curF!=='all') bk=bk.filter(b=>b.status===curF);
+  const dr=getDr();
+  if(!bk.length){$('blist').innerHTML='<div class="empty"><div class="ei">📭</div>Koi booking nahi mili.</div>';return;}
+  $('blist').innerHTML=bk.map(b=>{
+    const dOpts=dr.map(d=>`<option value="${d.id}" ${b.driver===d.id?'selected':''}>${d.name} — ${d.vn}</option>`).join('');
+    const dt=b.pTime&&b.pTime!=='Jald se jald'?new Date(b.pTime).toLocaleString('hi-IN'):b.pTime||'—';
+    const vl=b.vehicle==='riksha'?'🛺 E-Riksha':'🚛 Pickup';
+    const pl=b.payment==='upi'?'UPI/QR':b.payment==='cash'?'Cash':'Online';
+    return `<div class="bk">
+      <div class="bk-top">
+        <div><div class="bk-id">${b.id} | ${vl}</div><div class="bk-sub">📅 ${dt} | 💳 ${pl}${b.driverName?' | 🚗 '+b.driverName:''}</div></div>
+        <span class="badge ${b.status}">${b.status}</span>
+      </div>
+      <div class="bk-info">
+        <div class="ib"><div class="ibl">📦 Sender</div><div class="ibv">${b.sName} | ${b.sPhone}</div><div class="iba">${b.sAddr}</div><div class="iba" style="color:#CE93D8">📦 ${b.goods}</div></div>
+        <div class="ib"><div class="ibl">📍 Receiver</div><div class="ibv">${b.rName} | ${b.rPhone}</div><div class="iba">${b.rAddr}</div>${b.note?`<div class="iba" style="color:var(--yellow)">📝 ${b.note}</div>`:''}</div>
+      </div>
+      <div class="bk-acts">
+        ${(b.status==='pending'||b.status==='assigned')?`<select class="dsel" id="ds-${b.id}"><option value="">-- Driver chunein --</option>${dOpts}</select><button class="ab asgn" onclick="asgn('${b.id}')">✅ Assign</button>`:''}
+        ${(b.status!=='done'&&b.status!=='cancelled')?`<button class="ab dn" onclick="upSt('${b.id}','done')">✅ Done</button><button class="ab cn" onclick="upSt('${b.id}','cancelled')">❌ Cancel</button>`:''}
+        <a href="https://wa.me/${b.sPhone}?text=${encodeURIComponent('Namaste '+b.sName+'! Booking '+b.id+' receive ho gayi. Driver jald assign hoga.')}" target="_blank" class="ab wa">📲 Sender</a>
+        <a href="https://wa.me/${b.rPhone}?text=${encodeURIComponent('Namaste '+b.rName+'! Booking '+b.id+' ke through saman milne wala hai.')}" target="_blank" class="ab wa">📲 Receiver</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+function asgn(bid){
+  const s=$('ds-'+bid); if(!s.value){alert('Driver chunein!');return;}
+  const dr=getDr(); const d=dr.find(x=>x.id===s.value);
+  const bk=getBk(); const i=bk.findIndex(b=>b.id===bid);
+  if(i>-1){bk[i].driver=s.value;bk[i].driverName=d?d.name:'';bk[i].status='assigned';saveBk(bk);renderBk();}
+}
+function upSt(bid,st){
+  const bk=getBk();const i=bk.findIndex(b=>b.id===bid);
+  if(i>-1){bk[i].status=st;saveBk(bk);renderBk();}
+}
+
+// DRIVERS
+function addDriver(){
+  const n=$('dN').value.trim(),ph=$('dPh').value.trim(),v=$('dV').value,vn=$('dVN').value.trim().toUpperCase(),a=$('dA').value.trim();
+  if(!n||!ph||!vn){alert('Naam, Phone, Vehicle No. zaruri hai.');return;}
+  const dr=getDr();
+  dr.push({id:'DR-'+Date.now(),name:n,phone:ph,vehicle:v,vn,area:a,available:true});
+  saveDr(dr);
+  ['dN','dPh','dVN','dA'].forEach(id=>$(id).value='');
+  renderDr();renderStats();
+}
+function renderDr(){
+  const dr=getDr();
+  if(!dr.length){$('dlist').innerHTML='<div class="empty"><div class="ei">🚗</div>Koi driver nahi. Add karein.</div>';return;}
+  $('dlist').innerHTML=dr.map(d=>`<div class="dc">
+    <div class="dn2">${d.name}</div>
+    <div class="dp">📞 ${d.phone}</div>
+    <div class="di">${d.vehicle==='riksha'?'🛺 E-Riksha':'🚛 Pickup'} | ${d.vn}</div>
+    ${d.area?`<div class="di">📍 ${d.area}</div>`:''}
+    <span class="av ${d.available?'y':'n'}">${d.available?'✅ Available':'⏳ Busy'}</span>
+    <div class="dbtns">
+      <button class="db" onclick="togAv('${d.id}')">${d.available?'Busy Mark':'Available Mark'}</button>
+      <a href="https://wa.me/${d.phone}" target="_blank" class="db">📲 WA</a>
+      <button class="db del" onclick="delDr('${d.id}')">🗑️ Delete</button>
+    </div>
+  </div>`).join('');
+}
+function togAv(id){const d=getDr();const i=d.findIndex(x=>x.id===id);if(i>-1){d[i].available=!d[i].available;saveDr(d);renderDr();}}
+function delDr(id){if(!confirm('Delete karein?'))return;saveDr(getDr().filter(d=>d.id!==id));renderDr();renderStats();}
+
+// SETTINGS
+function loadSettings(){$('waN').value=localStorage.getItem(K.wa)||'';}
+function chgPass(){
+  const o=$('op').value,n1=$('np').value,n2=$('np2').value;
+  const m=$('pmsg');
+  if(o!==getPass()){m.textContent='❌ Purana password galat.';m.className='sm er';m.style.display='block';return;}
+  if(n1!==n2){m.textContent='❌ Naya password match nahi.';m.className='sm er';m.style.display='block';return;}
+  if(n1.length<6){m.textContent='❌ 6+ characters rakhen.';m.className='sm er';m.style.display='block';return;}
+  localStorage.setItem(K.pass,n1);
+  ['op','np','np2'].forEach(id=>$(id).value='');
+  m.textContent='✅ Password badal gaya!';m.className='sm ok';m.style.display='block';
+  setTimeout(()=>m.style.display='none',3000);
+}
+function saveWa(){
+  localStorage.setItem(K.wa,$('waN').value.trim());
+  $('wamsg').style.display='block';setTimeout(()=>$('wamsg').style.display='none',3000);
+}
+function clearBk(){
+  if(!confirm('Sabhi bookings clear hongi?'))return;
+  localStorage.removeItem(K.bk);localStorage.removeItem(K.cnt);
+  renderBk();renderStats();
+}
+</script>
+</body>
+</html>
